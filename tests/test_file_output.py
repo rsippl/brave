@@ -68,24 +68,6 @@ def assert_valid_output_file(output_video_location):
         if message.src == pipeline:
             old_state, new_state, pending_state = message.parse_state_changed()
             if new_state == Gst.State.PAUSED:
-                element = pipeline.get_by_name('inputselector1')
-                caps = element.get_static_pad('src').get_current_caps().to_string()
-                assert caps == 'audio/x-raw, format=(string)F32LE, layout=(string)non-interleaved,' \
-                               ' rate=(int)48000, channels=(int)2, channel-mask=(bitmask)0x0000000000000003'
-
-                element = pipeline.get_by_name('inputselector0')
-                caps = element.get_static_pad('src').get_current_caps().to_string()
-                assert caps == 'video/x-raw,' \
-                               ' format=(string)NV12,' \
-                               ' width=(int)640,' \
-                               ' height=(int)360,' \
-                               ' interlace-mode=(string)progressive,' \
-                               ' multiview-mode=(string)mono,' \
-                               ' multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono,' \
-                               ' pixel-aspect-ratio=(fraction)1/1,' \
-                               ' chroma-site=(string)jpeg,' \
-                               ' colorimetry=(string)bt601,' \
-                               ' framerate=(fraction)30/1'
                 break
 
     pipeline.set_state(Gst.State.NULL)
