@@ -8,7 +8,6 @@ pyyaml = "*"
 gbulb = "*"
 sanic = "*"
 websockets = "*"
-pytest = "*"
 pillow = "*"
 pygobject = "*"
 vext = "*"
@@ -16,6 +15,8 @@ psutil = "*"
 gobject = "*"
 
 [dev-packages]
+pytest = "*"
+requests = "*"
 
 [requires]
 python_version = "3"
