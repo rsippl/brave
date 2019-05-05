@@ -42,27 +42,50 @@ def assert_valid_output_file(output_video_location):
     from gi.repository import Gst, GLib
 
     Gst.init(None)
-    mainloop = GLib.MainLoop()
 
     # We create a pipeline so that we can read the file and check it:
     pipeline = Gst.ElementFactory.make("playbin")
     pipeline.set_property('uri','file://'+output_video_location)
     playsink = pipeline.get_by_name('playsink')
     playsink.set_property('video-sink', Gst.ElementFactory.make('fakesink'))
-    pipeline.set_state(Gst.State.PAUSED)
+    ret = pipeline.set_state(Gst.State.PAUSED)
 
-    def after_a_second():
-        assert pipeline.get_state(0).state == Gst.State.PAUSED
-        element = pipeline.get_by_name('inputselector1')
-        caps = element.get_static_pad('src').get_current_caps()
-        assert caps.to_string() == 'audio/x-raw, format=(string)F32LE, layout=(string)interleaved, rate=(int)48000, channels=(int)2, channel-mask=(bitmask)0x0000000000000003'
+    assert ret != Gst.StateChangeReturn.FAILURE
 
-        element = pipeline.get_by_name('inputselector0')
-        caps = element.get_static_pad('src').get_current_caps()
-        assert caps.to_string() == 'video/x-raw, format=(string)NV12, width=(int)640, height=(int)360, interlace-mode=(string)progressive, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)jpeg, colorimetry=(string)bt601, framerate=(fraction)30/1'
+    bus = pipeline.get_bus()
 
-        pipeline.set_state(Gst.State.NULL)
-        mainloop.quit()
+    while True:
+        message = bus.timed_pop_filtered(
+            Gst.CLOCK_TIME_NONE,
+            Gst.MessageType.STATE_CHANGED |
+            Gst.MessageType.ERROR |
+            Gst.MessageType.EOS
+        )
+        assert message.type != Gst.MessageType.ERROR
+        if message.type == Gst.MessageType.EOS:
+            break
+        assert message.type == Gst.MessageType.STATE_CHANGED
+        if message.src == pipeline:
+            old_state, new_state, pending_state = message.parse_state_changed()
+            if new_state == Gst.State.PAUSED:
+                element = pipeline.get_by_name('inputselector1')
+                caps = element.get_static_pad('src').get_current_caps().to_string()
+                assert caps == 'audio/x-raw, format=(string)F32LE, layout=(string)non-interleaved,' \
+                               ' rate=(int)48000, channels=(int)2, channel-mask=(bitmask)0x0000000000000003'
 
-    GLib.timeout_add(1000, after_a_second)
-    mainloop.run()
+                element = pipeline.get_by_name('inputselector0')
+                caps = element.get_static_pad('src').get_current_caps().to_string()
+                assert caps == 'video/x-raw,' \
+                               ' format=(string)NV12,' \
+                               ' width=(int)640,' \
+                               ' height=(int)360,' \
+                               ' interlace-mode=(string)progressive,' \
+                               ' multiview-mode=(string)mono,' \
+                               ' multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono,' \
+                               ' pixel-aspect-ratio=(fraction)1/1,' \
+                               ' chroma-site=(string)jpeg,' \
+                               ' colorimetry=(string)bt601,' \
+                               ' framerate=(fraction)30/1'
+                break
+
+    pipeline.set_state(Gst.State.NULL)
