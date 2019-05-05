@@ -3,7 +3,7 @@ from utils import *
 
 
 def test_image_input_from_command_line(run_brave, create_config_file):
-    image_uri = 'file://' + test_directory() + '/assets/image_640_360.png'
+    image_uri = 'file://' + assets_directory() + '/image_640_360.png'
     config = {
         'enable_audio': False, # useful for debugging TODO remove
         'inputs': [

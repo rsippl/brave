@@ -23,7 +23,7 @@ def test_brave_with_full_config_file(run_brave, create_config_file):
     output_image_location = create_output_image_location()
     output_video_location = create_output_video_location()
 
-    file_asset = test_directory() + '/assets/5_second_video.mp4'
+    file_asset = assets_directory() + '/5_second_video.mp4'
 
     config = {
     'inputs': [

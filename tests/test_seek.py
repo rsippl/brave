@@ -30,7 +30,7 @@ def test_seek(run_brave):
 
 
 def create_input():
-    uri = 'file://' + test_directory() + '/assets/5_second_video.mp4'
+    uri = 'file://' + assets_directory() + '/5_second_video.mp4'
     run_brave()
     add_input({'type': 'uri', 'state': 'PAUSED', 'uri': uri})
     time.sleep(1)

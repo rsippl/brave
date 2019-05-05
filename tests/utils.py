@@ -112,8 +112,8 @@ def delete_if_exists(name):
         pass
 
 
-def test_directory():
-    return os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+def assets_directory():
+    return os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + '/assets'
 
 
 temp_directory = None

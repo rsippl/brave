@@ -1,7 +1,7 @@
 import time, pytest
 from utils import *
-FIVE_SECOND_VIDEO = 'file://' + test_directory() + '/assets/5_second_video.mp4'
-# TWO_SECOND_VIDEO = 'file://' + test_directory() + '/assets/2_second_video.mp4'
+FIVE_SECOND_VIDEO = 'file://' + assets_directory() + '/5_second_video.mp4'
+# TWO_SECOND_VIDEO = 'file://' + assets_directory() + '/2_second_video.mp4'
 
 
 def test_uri_input_from_command_line(run_brave, create_config_file):
